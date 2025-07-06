@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
+import { getSession } from "next-auth/react";
 import formidable from "formidable";
 import fs from "fs";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
 
 export const config = {
   api: {
@@ -13,58 +14,59 @@ export const config = {
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const session = await getSession({ req });
+
+  if (!session) {
+    return res.status(401).json({ message: "Nicht eingeloggt" });
+  }
+
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ message: "Methode nicht erlaubt" });
   }
 
-  const uploadDir = path.join(process.cwd(), "/public/uploads");
+  const uploadDir = path.join(process.cwd(), "public", "uploads");
+  if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const form = formidable({
-    uploadDir,
-    keepExtensions: true,
-  });
+  const form = formidable({ multiples: true, uploadDir, keepExtensions: true });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: "File parsing error" });
+      return res.status(500).json({ message: "Fehler beim Parsen" });
     }
-
-    const { name, description, userId } = fields;
-    const file = files.file?.[0];
-
-    if (!name || !description || !userId || !file) {
-      return res.status(400).json({ message: "Missing fields" });
-    }
-
-    // ✅ Dateiendung prüfen
-    const ext = path.extname(file.originalFilename || "").toLowerCase();
-    if (ext !== ".jar" && ext !== ".zip") {
-      // Datei sofort löschen, wenn nicht erlaubt
-      fs.unlinkSync(file.filepath);
-      return res.status(400).json({ message: "Nur .jar und .zip Dateien erlaubt" });
-    }
-
-    const relativePath = `/uploads/${path.basename(file.filepath)}`;
 
     try {
+      const pluginFile = files.pluginFile?.[0] || files.pluginFile;
+      const iconFile = files.iconFile?.[0] || files.iconFile;
+
+      const pluginPath = pluginFile ? `/uploads/${path.basename(pluginFile.filepath)}` : "";
+      const iconPath = iconFile ? `/uploads/${path.basename(iconFile.filepath)}` : "";
+
       await prisma.plugin.create({
         data: {
-          name: String(name),
-          description: String(description),
-          userId: Number(userId),
-          file: relativePath,
+          title: String(fields.title),
+          version: String(fields.version),
+          tagline: String(fields.tagline),
+          category: String(fields.category),
+          price: parseFloat(fields.price as string),
+          description: String(fields.description),
+          fileUrl: pluginPath,
+          iconUrl: iconPath,
+          discordId: fields.discordId ? String(fields.discordId) : null,
+          bStatsId: fields.bStatsId ? String(fields.bStatsId) : null,
+          sourceLink: fields.sourceLink ? String(fields.sourceLink) : null,
+          donationLink: fields.donationLink ? String(fields.donationLink) : null,
+          requiredDeps: fields.requiredDeps ? String(fields.requiredDeps) : null,
+          optionalDeps: fields.optionalDeps ? String(fields.optionalDeps) : null,
+          languages: fields.languages ? String(fields.languages) : null,
+          userId: Number(fields.userId),
         },
       });
 
-      res.status(201).json({ message: "Plugin hochgeladen" });
+      res.status(200).json({ message: "Erfolgreich hochgeladen!" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Datenbankfehler" });
+      res.status(500).json({ message: "Fehler beim Speichern in DB" });
     }
   });
 }

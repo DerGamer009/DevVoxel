@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UploadIcon } from "@radix-ui/react-icons"; // Optional: für Symbol
 
 export default function UploadPage() {
   const { data: session, status } = useSession();
@@ -25,13 +26,13 @@ export default function UploadPage() {
   const [pluginFile, setPluginFile] = useState<File | null>(null);
   const [iconFile, setIconFile] = useState<File | null>(null);
 
-  if (status === "loading") return <p>Lade...</p>;
+  if (status === "loading") return <p className="text-center text-gray-300">Lade...</p>;
 
   if (!session) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 space-y-4">
-        <p className="text-lg">Du musst eingeloggt sein, um Plugins hochzuladen.</p>
-        <Link href="/login" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500 transition">Zum Login</Link>
+      <div className="flex flex-col items-center justify-center p-10 space-y-4">
+        <p className="text-lg text-white">Du musst eingeloggt sein, um Plugins hochzuladen.</p>
+        <Link href="/login" className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-500 transition">Zum Login</Link>
       </div>
     );
   }
@@ -72,72 +73,86 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="flex flex-col items-center p-10 space-y-8 w-full max-w-3xl mx-auto bg-gray-900 rounded-xl shadow-lg">
-      <h1 className="text-3xl font-bold text-center text-white">Create New Resource</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-6 w-full">
-        
-        {/* Basis-Info */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Basis-Info</h2>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Resource title"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={version} onChange={(e) => setVersion(e.target.value)} placeholder="Version"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Tag line"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <select value={category} onChange={(e) => setCategory(e.target.value)}
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-            <option value="General">General</option>
-            <option value="Addon">Addon</option>
-            <option value="API">API</option>
-            <option value="Utility">Utility</option>
-          </select>
-          <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} placeholder="Price (€)"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+    <div className="flex flex-col items-center p-10 space-y-8 w-full max-w-3xl mx-auto text-white">
+      <h1 className="text-4xl font-bold text-center mb-4">Create New Resource</h1>
+      
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-8 w-full">
+        {/* Block: Basic Info */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-4">📝 Basis-Informationen</h2>
+          <div className="space-y-4">
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titel (z. B. 'PlayerDataSync')"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={version} onChange={(e) => setVersion(e.target.value)} placeholder="Version (z. B. 1.0.0)"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Kurze Tagline"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <select value={category} onChange={(e) => setCategory(e.target.value)}
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+              <option value="General">General</option>
+              <option value="Addon">Addon</option>
+              <option value="API">API</option>
+              <option value="Utility">Utility</option>
+            </select>
+            <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value))} placeholder="Preis (€)"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <p className="text-sm text-gray-400">Setze 0 für kostenlos.</p>
+          </div>
         </div>
 
-        {/* Dateien */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Dateien</h2>
-          <input type="file" accept=".jar,.zip" onChange={(e) => setPluginFile(e.target.files?.[0] ?? null)}
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none transition" />
-          <input type="file" accept=".png,.jpg,.jpeg" onChange={(e) => setIconFile(e.target.files?.[0] ?? null)}
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none transition" />
+        {/* Block: Dateien */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-4">📄 Dateien</h2>
+          <div className="space-y-4">
+            <input type="file" accept=".jar,.zip" onChange={(e) => setPluginFile(e.target.files?.[0] ?? null)}
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 file:cursor-pointer" />
+            <p className="text-sm text-gray-400">Erlaubt: .jar, .zip</p>
+            <input type="file" accept=".png,.jpg,.jpeg" onChange={(e) => setIconFile(e.target.files?.[0] ?? null)}
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 file:cursor-pointer" />
+            <p className="text-sm text-gray-400">Erlaubt: .png, .jpg (Icon)</p>
+          </div>
         </div>
 
-        {/* Optionale Links */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Optionale Links</h2>
-          <input type="text" value={discordId} onChange={(e) => setDiscordId(e.target.value)} placeholder="Discord Server ID"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={bStatsId} onChange={(e) => setBStatsId(e.target.value)} placeholder="bStats ID"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={sourceLink} onChange={(e) => setSourceLink(e.target.value)} placeholder="Source code link"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={donationLink} onChange={(e) => setDonationLink(e.target.value)} placeholder="Donation link"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+        {/* Block: Zusätzliche Links */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-4">🔗 Optionale Links</h2>
+          <div className="space-y-4">
+            <input type="text" value={discordId} onChange={(e) => setDiscordId(e.target.value)} placeholder="Discord Server ID"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={bStatsId} onChange={(e) => setBStatsId(e.target.value)} placeholder="bStats ID"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={sourceLink} onChange={(e) => setSourceLink(e.target.value)} placeholder="Source Code Link"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={donationLink} onChange={(e) => setDonationLink(e.target.value)} placeholder="Spenden-Link"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+          </div>
         </div>
 
-        {/* Dependencies */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Dependencies & Sprachen</h2>
-          <input type="text" value={requiredDeps} onChange={(e) => setRequiredDeps(e.target.value)} placeholder="Required dependencies"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={optionalDeps} onChange={(e) => setOptionalDeps(e.target.value)} placeholder="Optional dependencies"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-          <input type="text" value={languages} onChange={(e) => setLanguages(e.target.value)} placeholder="Supported languages"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+        {/* Block: Abhängigkeiten & Sprachen */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-4">⚙️ Abhängigkeiten & Sprachen</h2>
+          <div className="space-y-4">
+            <input type="text" value={requiredDeps} onChange={(e) => setRequiredDeps(e.target.value)} placeholder="Benötigte Plugins"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={optionalDeps} onChange={(e) => setOptionalDeps(e.target.value)} placeholder="Optionale Plugins"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            <input type="text" value={languages} onChange={(e) => setLanguages(e.target.value)} placeholder="Unterstützte Sprachen"
+              className="w-full p-3 rounded border border-gray-700 bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+          </div>
         </div>
 
-        {/* Beschreibung */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Beschreibung</h2>
+        {/* Block: Beschreibung */}
+        <div className="bg-gray-800 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h2 className="text-xl font-semibold mb-4">🖊️ Beschreibung</h2>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-            placeholder="Beschreibung (BBCode oder plain text)"
-            className="w-full p-3 rounded border border-gray-700 bg-gray-800 text-white h-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+            placeholder="Beschreibung (BBCode oder Text)"
+            className="w-full p-3 rounded border border-gray-700 bg-gray-900 h-40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
         </div>
 
-        <button type="submit" className="bg-blue-600 text-white p-3 rounded font-semibold hover:bg-blue-500 transition">Upload</button>
+        <button type="submit" className="flex items-center justify-center bg-blue-600 text-white p-3 rounded font-semibold hover:bg-blue-500 transition">
+          <UploadIcon className="mr-2" />
+          Upload
+        </button>
       </form>
     </div>
   );
