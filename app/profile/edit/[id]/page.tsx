@@ -1,13 +1,10 @@
 import { prisma } from '@/lib/prisma'; // Passe den Pfad an dein Setup an
 import EditForm from './EditForm';
+import type { PageProps } from 'next';
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
-
-export default async function EditPluginPage({ params }: Props) {
+export default async function EditPluginPage({
+  params,
+}: PageProps<{ id: string }>) {
   const pluginId = Number(params.id);
   const plugin = await prisma.plugin.findUnique({
     where: { id: pluginId },
