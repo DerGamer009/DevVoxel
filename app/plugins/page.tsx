@@ -18,7 +18,7 @@ export default async function PluginsPage() {
       {plugins.length === 0 && <p>Keine Plugins vorhanden.</p>}
       {plugins.map((plugin) => (
         <div key={plugin.id} className="border p-4 rounded w-full max-w-md">
-          <h2 className="text-lg font-semibold">{plugin.name}</h2>
+          <h2 className="text-lg font-semibold">{plugin.title}</h2>
           <p className="text-sm text-gray-600">{plugin.description}</p>
           <p className="text-xs mt-2">Hochgeladen von: <strong>{plugin.user.name}</strong></p>
           <p className="text-xs text-gray-500">
