@@ -1,49 +1,26 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { prisma } from '@/lib/prisma'; // Passe den Pfad an dein Setup an
+import EditForm from './EditForm';
 
 interface Props {
   params: {
-    id: string | null | undefined;
+    id: string;
   };
 }
 
-export default function EditPluginPage({ params }: Props) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+export default async function EditPluginPage({ params }: Props) {
+  const pluginId = Number(params.id);
+  const plugin = await prisma.plugin.findUnique({
+    where: { id: pluginId },
+  });
 
-  useEffect(() => {
-    async function fetchPlugin() {
-      if (!params?.id) return; // <-- Wichtig: Abfangen, falls params oder id fehlt
-
-      const res = await fetch(`/api/plugin/${params.id}`);
-      if (!res.ok) {
-        // Fehlerbehandlung hier optional
-        return;
-      }
-      const data = await res.json();
-      setName(data.name);
-      setDescription(data.description);
-    }
-
-    fetchPlugin();
-  }, [params?.id]);
+  if (!plugin) {
+    return <p>Plugin nicht gefunden</p>;
+  }
 
   return (
-    <div>
-      {/* Dein Formular etc. */}
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Plugin Name"
-      />
-      <textarea
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Beschreibung"
-      />
-      {/* Submit Button usw. */}
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Plugin bearbeiten: {plugin.title}</h1>
+      <EditForm plugin={plugin} />
     </div>
   );
 }
