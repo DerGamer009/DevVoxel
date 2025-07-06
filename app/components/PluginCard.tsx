@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+// @ts-ignore
 import parseBBCode from "bbcode-to-html";
 import DOMPurify from "isomorphic-dompurify"; // für Sicherheit
 
