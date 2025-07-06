@@ -11,7 +11,7 @@ export default function PluginCard({ plugin }: { plugin: any }) {
 
   return (
     <div className="border p-4 rounded w-full max-w-md">
-      <h3 className="text-lg font-semibold">{plugin.name}</h3>
+      <h3 className="text-lg font-semibold">{plugin.title}</h3>
       <div
         className="text-sm text-gray-600"
         dangerouslySetInnerHTML={{ __html: safeHtml }}
@@ -25,9 +25,9 @@ export default function PluginCard({ plugin }: { plugin: any }) {
         })}
       </p>
 
-      {plugin.file && (
+      {plugin.fileUrl && (
         <a
-          href={plugin.file}
+          href={plugin.fileUrl}
           download
           className="inline-block mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 text-sm"
         >

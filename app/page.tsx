@@ -9,11 +9,11 @@ export default function HomePage() {
   const [stats, setStats] = useState({ plugins: 0, users: 0, downloads: 0 });
 
   useEffect(() => {
-    async function fetchPlugins() {
-      const res = await fetch("/api/plugins/latest");
-      const data = await res.json();
-      setPlugins(data);
-    }
+      async function fetchPlugins() {
+        const res = await fetch("/api/plugin/latest");
+        const data = await res.json();
+        setPlugins(data);
+      }
 
     async function fetchStats() {
       const res = await fetch("/api/stats");
