@@ -2,7 +2,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async function EditPluginPage({ params }: { params: { id: string } }) {
+export default async function EditPluginPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const plugin = await prisma.plugin.findUnique({
     where: { id: Number(params.id) },
   });
@@ -15,19 +19,20 @@ export default async function EditPluginPage({ params }: { params: { id: string 
     <main className="max-w-xl mx-auto p-8 text-white">
       <h1 className="text-3xl font-bold mb-8">Plugin bearbeiten: {plugin.name}</h1>
 
-      {/* Beispiel Formular (ausbauen möglich) */}
       <form>
         <div className="mb-4">
-          <label className="block mb-1 font-semibold">Name</label>
+          <label htmlFor="name" className="block mb-1 font-semibold">Name</label>
           <input
+            id="name"
             defaultValue={plugin.name}
             className="w-full rounded border border-gray-600 bg-gray-800 px-3 py-2 text-white"
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-semibold">Beschreibung</label>
+          <label htmlFor="description" className="block mb-1 font-semibold">Beschreibung</label>
           <textarea
+            id="description"
             defaultValue={plugin.description || ""}
             className="w-full rounded border border-gray-600 bg-gray-800 px-3 py-2 text-white resize-y"
           />
